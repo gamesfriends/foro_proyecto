@@ -29,5 +29,9 @@ const UsersSchema = new Schema({
     module.exports = UsersSchema.statics.encryptPass = async (password) =>{
         return await bcrypt.hash(password, 10)
     }
+   
+    module.exports = UsersSchema.statics.desencryptPass = async (receivedPass, hash) =>{
+        return await bcrypt.compare(receivedPass, hash);
+    }
 
     module.exports = mongoose.model("users", UsersSchema)

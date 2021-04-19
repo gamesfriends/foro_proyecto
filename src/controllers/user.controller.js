@@ -1,6 +1,9 @@
 const Users = require("../models/usersModel");
 const Roles = require("../models/rolesModel");
+const verifyToken = require("../middlewares/verifyToken"); 
+const verifyRole = require("../middlewares/verifyRole");
 const jwt = require('jsonwebtoken');
+
 
 const newUser = async (req, res) =>{
     
@@ -28,38 +31,74 @@ const newUser = async (req, res) =>{
         //roles comprobation
         if(req.body.roles){
             const foundRoles = await Roles.find({name: {$in: req.body.roles}}) // busca el nombre de rol pasado en la base de datos
+            if(foundRoles.length==0) res.status(404).json({message:"El rol especificado no existe"})
             newUser.roles = foundRoles.map(role => role.id) //gaurda array de ids de los roles del usuario
         }else if (!req.body.roles){
             const role = await Roles.findOne({name:"user"}) // default user
             newUser.roles = [role._id]
         }
 
+
+
         //pass encrypt
       newUser.password = await Users.encryptPass(req.body.password)
         
+      //save
+      const saved_user = await newUser.save();
+
 
         // token creation
+           
         const JWTKey = require ('../config').JWTKey;
+        
         const token = jwt.sign({
             exp: Math.floor(Date.now() / 1000) + (60 * 60),
-            data: req.body.password
+            data: {id:saved_user._id}
           }, JWTKey);
     
-        await newUser.save();
     
         res.status(200).json({token: token, user: newUser})
     
 }
 
 const getUsers = async (req,res) =>{
-    let error = null;
-    const users = await Users.find()
-            .catch(err => {error = err})
-            if(error) return res.status(500).json({message: "Error al consultar en la base de datos"})
-            else res.json({users})
+
+  //es admin?
+  const isAdmin = async ()=>{
+  
+    const user = await Users.findById(req.userId)
+    const rols = await Roles.find({_id : {$in: user.roles}})
+    for (const i of rols) {
+       if (i.name === "admin"){
+        let error = null;
+        const users = await Users.find()
+                .catch(err => {error = err})
+                if(error) return res.status(500).json({message: "Error al consultar en la base de datos"})
+                else return res.json({users, role:"ADMIN"})
+        }
+    }  
+       for (const i of rols) {
+           if (i.name === "moderator"){
+               let error = null;
+            const users = await Users.find({roles : {$in: user.roles}})
+                .catch(err => {error = err})
+                if(error) return res.status(500).json({message: "Error al consultar en la base de datos"})
+                else return res.json({users, role:"MODERATOR"})
+            
+            
+            }  
+        }
+        return res.status(403).json({message : 'Require Moderator or Admin role'})
+        
+    }
+  
+    isAdmin()
+    
 }
 
 const updateUserRoles = async (req, res) =>{
+
+
 //roles omprobation
 if(req.body.roles){
     const foundRoles = await Roles.find({name: {$in: req.body.roles}}) // busca el nombre de rol pasado en la base de datos

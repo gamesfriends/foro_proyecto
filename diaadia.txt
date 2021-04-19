@@ -8,12 +8,15 @@ dia 1 18/4/2021:
 5 creacion de token y encriptacion de password con bcrypt
 6 testeadas todas las rutas de usuarios OK
 
-proximo: 
-	1 control de permisos para borrar y modificar (roles) de usuarios
-	
-	2 login
-	3.b verificar token
-	4.c desencriptar pass
-	
 
 
+dia 2 19/4/2021:
+
+1 control de permisos para borrar y modificar (roles) de usuarios
+2 login y register
+2.b verificar token
+2.c desencriptar pass
+3 tests ok  
+
+
+proximo: posts y respuestas
