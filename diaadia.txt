@@ -1,0 +1,19 @@
+dia 1 18/4/2021:
+
+
+1 creados models users y roles
+2 creadas rutas users (get, post, put, delete)
+3 creados controladores de users
+4 verificacion de username y email no repetidos
+5 creacion de token y encriptacion de password con bcrypt
+6 testeadas todas las rutas de usuarios OK
+
+proximo: 
+	1 control de permisos para borrar y modificar (roles) de usuarios
+	
+	2 login
+	3.b verificar token
+	4.c desencriptar pass
+	
+
+
