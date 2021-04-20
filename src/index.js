@@ -17,6 +17,7 @@ require ('./databaseConnection').bdConnect();
 //routes
 app.use(require('./routes/user.routes'))
 app.use(require('./routes/auth.routes'))
+app.use(require('./routes/posts.routes'))
 
  //cear roles
  require('./libs/initialSetup').createRoles();
